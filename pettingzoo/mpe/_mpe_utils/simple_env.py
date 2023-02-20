@@ -263,7 +263,7 @@ class SimpleEnv(AECEnv):
             self.render()
 
     def enable_render(self, mode="human"):
-        if not self.renderOn and mode == "human":
+        if not self.renderOn:
             self.screen = pygame.display.set_mode(self.screen.get_size())
             self.renderOn = True
 
@@ -276,15 +276,15 @@ class SimpleEnv(AECEnv):
 
         self.enable_render(self.render_mode)
 
-        observation = np.array(pygame.surfarray.pixels3d(self.screen))
-        if self.render_mode == "human":
+        self.draw()
+        if self.render_mode == "rgb_array":
             self.draw()
             pygame.display.flip()
-        return (
-            np.transpose(observation, axes=(1, 0, 2))
-            if self.render_mode == "rgb_array"
-            else None
-        )
+            observation = np.array(pygame.surfarray.pixels3d(self.screen))
+            return np.transpose(observation, axes=(1, 0, 2))
+        if self.render_mode == "human":
+            pygame.display.flip()
+        return None
 
     def draw(self):
         # clear screen
