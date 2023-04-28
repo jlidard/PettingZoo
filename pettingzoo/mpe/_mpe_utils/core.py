@@ -79,6 +79,8 @@ class Agent(Entity):  # properties of agent entities
         self.action = Action()
         # script behavior to execute
         self.action_callback = None
+        # population_id
+        self.population_id = 1
 
 
 class World:  # multi-agent world

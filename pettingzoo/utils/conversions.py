@@ -245,7 +245,10 @@ class parallel_to_aec_wrapper(AECEnv):
         return self.env.action_space(agent)
 
     def reset(self, seed=None, return_info=False, options=None):
-        self._observations = self.env.reset(seed=seed, options=options)
+        if options is None:
+            self._observations = self.env.reset(seed=seed)
+        else:
+            self._observations = self.env.reset(seed=seed, options=options)
         self.agents = self.env.agents[:]
         self._live_agents = self.agents[:]
         self._actions: ActionDict = {agent: None for agent in self.agents}
@@ -289,7 +292,13 @@ class parallel_to_aec_wrapper(AECEnv):
             return
         self._actions[self.agent_selection] = action
         if self._agent_selector.is_last():
-            obss, rews, terminations, truncations, infos = self.env.step(self._actions)
+            out = self.env.step(self._actions)
+            if len(out) == 4:
+                obss, rews, terminations, infos = out
+                truncations = {}
+                truncations.update(terminations)
+            else:
+                obss, rews, terminations, truncations, infos = out
 
             self._observations = copy.copy(obss)
             self.terminations = copy.copy(terminations)
